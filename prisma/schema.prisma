@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Bill {
+  id              String      @id @default(uuid())
+
+  name            String
+  amount          Float
+  status          Int // 1: pending, 2: paid, 3: late
+  date            DateTime
+
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Investment {
+  id              String      @id @default(uuid())
+
+  name            String
+  amount          Float
+  date            DateTime
+    
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model User {
+  id              String      @id @default(uuid())
+
+  name            String      @unique
+
+  balance         Float
+  income          Float
+  invested        Float
+  expenses        Float
+
+  bills           Bill[]
+  investments     Investment[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
