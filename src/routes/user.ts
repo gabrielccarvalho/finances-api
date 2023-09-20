@@ -31,6 +31,8 @@ export async function getUserInfo(app: FastifyInstance) {
       }
     })
 
+    console.log(investments)
+
     if (!user) return
 
     const billSum = bills.map(bill => bill.amount).reduce((acc, amount) => acc + amount, 0)

@@ -2,6 +2,7 @@ import { fastifyCors } from '@fastify/cors'
 import { fastify } from "fastify"
 
 import { addBill, getBills, updateBill, updateStatus, deleteBill } from './routes/bills'
+import { addInvestment, deleteInvestment } from './routes/investments'
 import { getUserInfo } from './routes/user'
 
 const app = fastify()
@@ -9,6 +10,9 @@ const app = fastify()
 app.register(fastifyCors, {
   origin: '*'
 })
+
+app.register(deleteInvestment)
+app.register(addInvestment)
 
 app.register(getBills)
 app.register(addBill)

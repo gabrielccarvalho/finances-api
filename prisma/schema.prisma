@@ -29,9 +29,10 @@ model Investment {
   id              String      @id @default(uuid())
 
   name            String
+  security        String
   amount          Float
   date            DateTime
-    
+  
   user            User        @relation(fields: [userId], references: [id])
   userId          String
 
