@@ -11,12 +11,66 @@ export async function getUserInfo(app: FastifyInstance) {
 
     const { userId } = paramsSchema.parse(req.params)
 
-    const info = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       }
     })
 
-    return info
+    return user
+  })
+}
+
+export async function updateUserExpenses(app: FastifyInstance) {
+  app.post('/expenses/:userId', async (req) => {
+    const paramsSchema = z.object({
+      userId: z.string().uuid()
+    })
+
+    const bodySchema = z.object({
+      expenses: z.number()
+    })
+
+    const { userId } = paramsSchema.parse(req.params)
+
+    const { expenses } = bodySchema.parse(req.body)
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        expenses,
+      }
+    })
+
+    return user
+  })
+}
+
+export async function updateUserBalance(app: FastifyInstance) {
+  app.post('/balance/:userId', async (req) => {
+    const paramsSchema = z.object({
+      userId: z.string().uuid()
+    })
+
+    const bodySchema = z.object({
+      balance: z.number()
+    })
+
+    const { userId } = paramsSchema.parse(req.params)
+
+    const { balance } = bodySchema.parse(req.body)
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        balance,
+      }
+    })
+
+    return user
   })
 }
