@@ -52,7 +52,13 @@ export async function addBill(app: FastifyInstance) {
       }
     })
 
-    return bill
+    const updatedBills = await prisma.bill.findMany({
+      where: {
+        userId: bill.userId,
+      }
+    })
+
+    return updatedBills
   })
 }
 
@@ -85,7 +91,13 @@ export async function updateBill(app: FastifyInstance) {
       }
     })
 
-    return bill
+    const updatedBills = await prisma.bill.findMany({
+      where: {
+        userId: bill.userId,
+      }
+    })
+
+    return updatedBills
   })
 }
 
@@ -103,6 +115,12 @@ export async function deleteBill(app: FastifyInstance) {
       }
     })
 
-    return bill
+    const updatedBills = await prisma.bill.findMany({
+      where: {
+        userId: bill.userId,
+      }
+    })
+
+    return updatedBills
   })
 }
