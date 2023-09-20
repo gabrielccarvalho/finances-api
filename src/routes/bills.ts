@@ -56,6 +56,39 @@ export async function addBill(app: FastifyInstance) {
   })
 }
 
+export async function updateBill(app: FastifyInstance) {
+  app.put('/bills/:id', async (req) => {
+    const paramsSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const bodySchema = z.object({
+      name: z.string(),
+      amount: z.number(),
+      date: z.string(),
+      status: z.number(),
+    })
+
+    const { id } = paramsSchema.parse(req.params)
+
+    const { name, amount, date, status } = bodySchema.parse(req.body)
+
+    const bill = await prisma.bill.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        amount,
+        date,
+        status,
+      }
+    })
+
+    return bill
+  })
+}
+
 export async function deleteBill(app: FastifyInstance) {
   app.delete('/bills/:id', async (req) => {
     const paramsSchema = z.object({

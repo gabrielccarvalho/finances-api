@@ -11,66 +11,48 @@ export async function getUserInfo(app: FastifyInstance) {
 
     const { userId } = paramsSchema.parse(req.params)
 
+    let finalUser = {}
+
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
       }
     })
 
-    return user
-  })
-}
-
-export async function updateUserExpenses(app: FastifyInstance) {
-  app.post('/expenses/:userId', async (req) => {
-    const paramsSchema = z.object({
-      userId: z.string().uuid()
+    const bills = await prisma.bill.findMany({
+      where: {
+        userId,
+      }
+    })
+    
+    const investments = await prisma.investment.findMany({
+      where: {
+        userId,
+      }
     })
 
-    const bodySchema = z.object({
-      expenses: z.number()
-    })
+    if (!user) return
 
-    const { userId } = paramsSchema.parse(req.params)
+    const billSum = bills.map(bill => bill.amount).reduce((acc, amount) => acc + amount, 0)
+    const investmentSum = investments.reduce((acc, investment) => acc + investment.amount, 0)
 
-    const { expenses } = bodySchema.parse(req.body)
-
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        expenses,
+        expenses: billSum,
+        invested: investmentSum,
+        balance: user.income + investmentSum - billSum,
       }
     })
 
-    return user
-  })
-}
+    finalUser = {
+      ...user,
+      bills,
+      investments,
+    }
 
-export async function updateUserBalance(app: FastifyInstance) {
-  app.post('/balance/:userId', async (req) => {
-    const paramsSchema = z.object({
-      userId: z.string().uuid()
-    })
-
-    const bodySchema = z.object({
-      balance: z.number()
-    })
-
-    const { userId } = paramsSchema.parse(req.params)
-
-    const { balance } = bodySchema.parse(req.body)
-
-    const user = await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        balance,
-      }
-    })
-
-    return user
+    return finalUser
   })
 }
