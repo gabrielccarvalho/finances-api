@@ -38,12 +38,14 @@ export async function getUserInfo(app: FastifyInstance) {
     const billSum = bills.map(bill => bill.amount).reduce((acc, amount) => acc + amount, 0)
     const investmentSum = investments.reduce((acc, investment) => acc + investment.amount, 0)
 
+    const investmentMonthlySum = investments.reduce((acc, investment) => acc + investment.monthAmount, 0)
+
     await prisma.user.update({
       where: {
         id: userId,
       },
       data: {
-        expenses: billSum,
+        expenses: billSum + investmentMonthlySum,
         invested: investmentSum,
         balance: user.income + investmentSum - billSum,
       }

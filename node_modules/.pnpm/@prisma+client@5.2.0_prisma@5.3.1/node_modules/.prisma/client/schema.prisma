@@ -31,6 +31,8 @@ model Investment {
   name            String
   security        String
   amount          Float
+  monthAmount     Float
+  rentability     Float
   date            DateTime
   
   user            User        @relation(fields: [userId], references: [id])

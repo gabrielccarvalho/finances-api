@@ -12,20 +12,24 @@ export async function addInvestment(app: FastifyInstance) {
     const bodySchema = z.object({
       name: z.string(),
       amount: z.number(),
+      monthAmount: z.number(),
       date: z.string(),
       security: z.string(),
+      rentability: z.number(),
     })
 
     const { userId } = paramsSchema.parse(req.params)
 
-    const { name, amount, date, security } = bodySchema.parse(req.body)
+    const { name, amount, monthAmount, date, security, rentability } = bodySchema.parse(req.body)
 
     const investment = await prisma.investment.create({
       data: {
         name,
         amount,
+        monthAmount,
         date,
         security,
+        rentability,
         user: {
           connect: {
             id: userId,
