@@ -62,6 +62,51 @@ export async function addBill(app: FastifyInstance) {
   })
 }
 
+export async function updateStatus(app: FastifyInstance) {
+  app.put('/bills/:id/:status', async (req) => {
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+      status: z.string(),
+    })
+
+    const { id, status } = paramsSchema.parse(req.params)
+
+    let formattedStatus = 0
+
+    switch (status) {
+      case 'paid':
+        formattedStatus = 3
+        break;
+      case 'pending':
+        formattedStatus = 2
+        break;
+      case 'late':
+        formattedStatus = 1
+        break;
+      default:
+        formattedStatus = 0
+        break;
+    }
+
+    const bill = await prisma.bill.update({
+      where: {
+        id,
+      },
+      data: {
+        status: formattedStatus,
+      }
+    })
+
+    const updatedBills = await prisma.bill.findMany({
+      where: {
+        userId: bill.userId,
+      }
+    })
+
+    return updatedBills
+  })
+}
+
 export async function updateBill(app: FastifyInstance) {
   app.put('/bills/:id', async (req) => {
     const paramsSchema = z.object({
