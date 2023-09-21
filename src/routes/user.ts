@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
 import { prisma } from '../lib/prisma';
+import { calculateTotalInvestment } from '../utils/calculate-investment';
 
 export async function getUserInfo(app: FastifyInstance) {
   app.get('/info/:userId', async (req) => {
@@ -31,12 +32,14 @@ export async function getUserInfo(app: FastifyInstance) {
       }
     })
 
-    console.log(investments)
-
     if (!user) return
 
     const billSum = bills.map(bill => bill.amount).reduce((acc, amount) => acc + amount, 0)
-    const investmentSum = investments.reduce((acc, investment) => acc + investment.amount, 0)
+
+    const accumulatedAmount = investments.reduce((acc, investment) => acc + investment.monthAmount + parseFloat(calculateTotalInvestment(
+      investment.amount,
+      investment.rentability,
+      Math.ceil(Math.abs(new Date().getTime() - investment.date.getTime()) / (1000 * 3600 * 24)))), 0)
 
     const investmentMonthlySum = investments.reduce((acc, investment) => acc + investment.monthAmount, 0)
 
@@ -46,8 +49,8 @@ export async function getUserInfo(app: FastifyInstance) {
       },
       data: {
         expenses: billSum + investmentMonthlySum,
-        invested: investmentSum,
-        balance: user.income + investmentSum - billSum,
+        invested: accumulatedAmount,
+        balance: user.income + accumulatedAmount - billSum,
       }
     })
 
